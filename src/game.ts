@@ -46,7 +46,7 @@ export class Game extends bge.Game<Player> {
         });
 
         // Start the main game logic
-        await main.call(this);
+        await main(this);
 
         // Return final scores
         return {
