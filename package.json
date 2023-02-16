@@ -12,9 +12,9 @@
     "dist/index.js"
   ],
   "dependencies": {
-    "bge-core": "^0.1.7"
+    "bge-core": "^0.2.0"
   },
   "devDependencies": {
-    "bge-dev": "^0.1.6"
+    "bge-dev": "^0.2.0"
   }
 }
