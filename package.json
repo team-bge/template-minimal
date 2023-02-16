@@ -15,6 +15,6 @@
     "bge-core": "^0.2.0"
   },
   "devDependencies": {
-    "bge-dev": "^0.2.0"
+    "bge-dev": "^0.2.1"
   }
 }
