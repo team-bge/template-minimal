@@ -1,5 +1,6 @@
 import * as bge from 'bge-core';
-import { Game } from './game';
+
+import { Game } from './game.js';
 
 /**
  * @summary Required default export describing our game's config.
