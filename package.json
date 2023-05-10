@@ -12,5 +12,9 @@
   },
   "dependencies": {
     "bge-core": "^0.3.12"
+  },
+  "boardgameengine": {
+    "type": "game",
+    "title": "Minimal Template"
   }
 }
