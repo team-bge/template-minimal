@@ -1,12 +1,12 @@
 import * as bge from "bge-core";
 
 import { Player } from "./player.js";
-import { TableCenter } from "./table.js";
+import { TableCenter } from "./objects/table.js";
 
 /**
  * Handles the main logic of your game.
  */
-export class Game extends bge.StateMachineGame<Player> {
+export class Game extends bge.Game<Player> {
     /**
      * Minimum number of players this game supports.
      */
@@ -24,17 +24,27 @@ export class Game extends bge.StateMachineGame<Player> {
     readonly tableCenter = new TableCenter(this);
 
     /**
+     * Players, sorted by turn order.
+     */
+    readonly turnOrder: Player[] = [];
+    
+    /**
+     * Who's turn is it?
+     */
+    currentPlayer: Player;
+
+    /**
      * Displays a zone for each player, arranged in a rectangle around the table.
      */
     @bge.display({
         arrangement: new bge.RectangularArrangement({
             size: new bge.Vector3(
-                TableCenter.WIDTH + 2,
-                TableCenter.HEIGHT + 2)
+                TableCenter.WIDTH + 5,
+                TableCenter.HEIGHT + 5)
         })
     })
     get playerZones() {
-        return this.players.map(x => x.zone);
+        return this.turnOrder.map(x => x.zone);
     }
 
     /**
@@ -46,83 +56,33 @@ export class Game extends bge.StateMachineGame<Player> {
         super(Player);
 
     }
-    
-    /**
-     * For games implemented as a state machine, returns the initial state's function.
-     */
-    get initialState(): bge.GameStateFunction {
-        return this.startGame;
+
+    override getNextPlayer(player: Player): Player {
+        const index = this.turnOrder.indexOf(player);
+        return this.turnOrder[(index + 1) % this.turnOrder.length];
     }
 
-    //
-    // Below are some example game state functions that implement a basic round structure.
-    //
-    // Each game state function must:
-    //  * be async
-    //  * take no parameters
-    //  * return (resolve with) either:
-    //    - a reference to the next game state function
-    //    - a bge.IGameResult to end the game
-    //
-    
-    currentPlayer: Player;
+    protected override async onRun(): Promise<bge.IGameResult> {
+        await this.startGame();
 
-    roundNumber: number;
-    turnNumber: number;
+        // Main game logic here...
 
-    async startGame(): bge.GameState {
-
-        this.roundNumber = 0;
-
-        // Pick a random player to start
-        this.currentPlayer = this.random.item(this.players);
-
-        return this.startRound;
+        return await this.endGame();
     }
 
-    async startRound(): bge.GameState {
-
-        this.turnNumber = 0;
-        this.roundNumber += 1;
+    async startGame(): Promise<void> {
         
-        this.message.set("Round {0}!", this.roundNumber);
-        
-        await this.delay.short();
+        // Pick turn order
 
-        return this.startTurn;
+        this.turnOrder.length = 0;
+        this.turnOrder.push(...this.players);
+
+        this.random.shuffle(this.turnOrder);
+
+        this.currentPlayer = this.turnOrder[0];
     }
 
-    async endRound(): bge.GameState {
-        return this.roundNumber < 4
-            ? this.startRound
-            : this.endGame;
-    }
-
-    async startTurn(): bge.GameState {
-
-        this.turnNumber += 1;
-
-        this.message.set("It's {0}'s turn!", this.currentPlayer);
-
-        // Prompt the current player to click a button
-        await this.currentPlayer.prompt.click(new bge.Button("Click me!"));
-
-        this.currentPlayer.score += this.random.int(1, 10);
-
-        return this.endTurn;
-    }
-
-    async endTurn(): bge.GameState {
-
-        // Choose the next player, clockwise around the table
-        this.currentPlayer = this.getNextPlayer(this.currentPlayer);
-
-        return this.turnNumber < this.players.length
-            ? this.startTurn
-            : this.endRound;
-    }
-
-    async endGame(): bge.GameState {
+    async endGame(): Promise<bge.IGameResult> {
 
         this.message.set("Game over!");
 
@@ -131,7 +91,7 @@ export class Game extends bge.StateMachineGame<Player> {
         // Return final scores to end the game
 
         return {
-            scores: this.players.map(x => x.score)
+            scores: this.players.map(x => 0)
         };
     }
 }

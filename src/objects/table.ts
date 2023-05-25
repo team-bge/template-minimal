@@ -1,6 +1,6 @@
 import * as bge from "bge-core";
 
-import { Game } from "./game.js";
+import { Game } from "../game.js";
 
 /**
  * This zone displays all the shared objects in the middle of the table.
@@ -17,7 +17,7 @@ export class TableCenter extends bge.Zone {
 
         this.game = game;
 
-        this.width = 24;
-        this.height = 26;
+        this.width = TableCenter.WIDTH;
+        this.height = TableCenter.HEIGHT;
     }
 }
