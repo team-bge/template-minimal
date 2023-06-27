@@ -55,6 +55,8 @@ export class Game extends bge.Game<Player> {
         // We need to tell bge.Game<TPlayer> how to construct a player here.
         super(Player);
 
+        // Set exported "game" variable so it's easily accessible in other modules.
+        game = this;
     }
 
     override getNextPlayer(player: Player): Player {
@@ -71,7 +73,7 @@ export class Game extends bge.Game<Player> {
     }
 
     async startGame(): Promise<void> {
-        
+
         // Pick turn order
 
         this.turnOrder.length = 0;
@@ -95,3 +97,8 @@ export class Game extends bge.Game<Player> {
         };
     }
 }
+
+/**
+ * Current game instance.
+ */
+export let game: Game;
