@@ -77,16 +77,16 @@ export class Game extends bge.Game<Player> {
         this.turnOrder.length = 0;
         this.turnOrder.push(...this.players);
 
-        this.random.shuffle(this.turnOrder);
+        bge.random.shuffle(this.turnOrder);
 
         this.currentPlayer = this.turnOrder[0];
     }
 
     async endGame(): Promise<bge.IGameResult> {
 
-        this.message.set("Game over!");
+        bge.message.set("Game over!");
 
-        await this.delay.long();
+        await bge.delay.long();
 
         // Return final scores to end the game
 
